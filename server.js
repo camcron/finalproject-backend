@@ -1,9 +1,14 @@
 import express from "express";
 import cors from "cors";
+import mongoose from "mongoose";
 import dotenv from 'dotenv';
 dotenv.config();
 const apiKey = process.env.API_KEY
 const fetch = require('node-fetch');
+
+const mongoUrl = process.env.MONGO_URL || "mongodb://localhost/odyssey";
+mongoose.connect(mongoUrl, { useNewUrlParser: true, useUnifiedTopology: true });
+mongoose.Promise = Promise;
 
 // Defines the port the app will run on. Defaults to 8080, but can be overridden
 // when starting the server. Example command to overwrite PORT env variable value:
