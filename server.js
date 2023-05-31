@@ -1,15 +1,24 @@
 import express from "express";
 import cors from "cors";
+import mongoose from "mongoose";
+import crypto from 'crypto'
+import bcrypt from 'bcrypt'
+
 import dotenv from 'dotenv';
 dotenv.config();
 const apiKey = process.env.API_KEY
 const fetch = require('node-fetch');
+
+const mongoUrl = process.env.MONGO_URL || "mongodb://localhost/finalproject";
+mongoose.connect(mongoUrl, { useNewUrlParser: true, useUnifiedTopology: true });
+mongoose.Promise = Promise;
 
 // Defines the port the app will run on. Defaults to 8080, but can be overridden
 // when starting the server. Example command to overwrite PORT env variable value:
 // PORT=9000 npm start
 const port = process.env.PORT || 8080;
 const app = express();
+const listEndpoints = require('express-list-endpoints');
 
 const corsOptions = {
   origin: '*', // Allow all origins
@@ -23,9 +32,19 @@ app.use(cors(corsOptions));
 app.use(express.json());
 app.options('*', cors())  // Enable CORS preflight for all routes
 
-// Start defining your routes here
+// Start of routes
 app.get("/", (req, res) => {
-  res.send("Hello Final project!");
+  const welcomeMessage = "Final project API";
+  const endpoints = listEndpoints(app);
+
+  res.status(200).json({
+    success: true,
+    message: "OK",
+    body: {
+      welcomeMessage,
+      endpoints
+    }
+  });
 });
 
 // Getting the lng, lat from the frontend to pass to PLaces API
@@ -46,6 +65,104 @@ app.post('/api/places', async (req, res) => {
     res.status(500).send(error.message);
   }
 });
+
+// POST request to Goggle Place Details
+// using the place_id from the frontend
+// Endpoint is not using slug correctly
+// app.post('/api/places/:placeId', async (req, res) => {
+//   const placeId = req.body.place_id
+//   const placeDetailsUrl = `https://maps.googleapis.com/maps/api/place/details/json?place_id=${placeId}&key=${apiKey}`;
+
+//   try {
+//     const placeDetailsResp = await fetch(placeDetailsUrl);
+//     if (placeDetailsResp.ok) {
+//       const placeDetailData = await placeDetailsResp.json();
+//       res.json(placeDetailData);
+//     } else {
+//       throw new Error(`Google Places Details API error! Status: ${placeDetailsResp.status}`);
+//     }
+//   } catch (error) {
+//     console.error(error);
+//     res.status(500).send(error.message);
+//   }
+// });
+
+const { Schema } = mongoose;
+const UserSchema = new mongoose.Schema({
+  username: {
+    type: String,
+    required: true,
+    unique: true,
+  },
+  password: {
+    type: String,
+    required: true,
+    // minLength: 6
+  },
+  accessToken: {
+    type: String,
+    default: () => crypto.randomBytes(128).toString('hex')
+  }
+});
+
+const User = mongoose.model("User", UserSchema);
+
+app.post("/user/register", async (req, res) => {
+  const { username, password } = req.body
+  // const passwordRegex = /^(?=.*\d)(?=.*[a-z])(?=.*[A-Z])(?=.*[!@#\$%\^&\*]).{8,32}$/;
+    // This regular expression ensures:
+    // At least one digit: (?=.*\d)
+    // At least one lowercase letter: (?=.*[a-z])
+    // At least one uppercase letter: (?=.*[A-Z])
+    // At least one special character: (?=.*[!@#\$%\^&\*])
+    // A total length of between 8 and 32 characters: .{8,32}
+
+  // if (!passwordRegex.test(password)) {
+  //   return res.status(400).json({
+  //     success: false,
+  //     response: {
+  //       message: "Password needs to be between 8 and 32 characters, and include at least one number, one uppercase letter, one lowercase letter, and one special character."
+  //     }
+  //   })
+  // }
+
+  // const existingUserName = await User.findOne({ username: username});
+  // if (existingUserName) {
+  //   return res.status(400).json({
+  //     success: false,
+  //     response: {
+  //       message: "Username is already taken"
+  //     }
+  //   })
+  // }
+  try {
+    const salt = bcrypt.genSaltSync();
+    const newUser = await new User({
+      username: username,
+      password: bcrypt.hashSync(password, salt)
+    }).save();
+
+    res.status(201).json({
+      success: true,
+      response: {
+        username: newUser.username,
+        id: newUser._id,
+        accessToken: newUser.accessToken,
+        message: "User successfully created"
+      }
+    })
+  } catch (error) {
+    res.status(400).json({
+      success: false,
+      response: {
+        error: error,
+        message: "Could not create user"
+      }
+    })
+  }
+});
+
+
 
 // Start the server
 app.listen(port, () => {
