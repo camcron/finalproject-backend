@@ -107,7 +107,27 @@ const UserSchema = new mongoose.Schema({
 
 const User = mongoose.model("User", UserSchema);
 
-app.post("/user/register", async (req, res) => {
+// REMOVE LATER!!!! ONLY FOR TESTING PURPOSES!!!
+app.get("/users", async (req, res) => {
+  try {
+  const allUsers = await User.find();
+  if (allUsers) {
+    res.status(200).json({
+      success: true,
+      body: allUsers,
+      message: "hej hej",
+    })
+  }
+  } catch (e) {
+    res.status(500).json({
+      success: false,
+      response: e
+    })
+  }
+})
+
+// CREATE A NEW USER
+app.post("/users/register", async (req, res) => {
   const { username, password } = req.body
   // const passwordRegex = /^(?=.*\d)(?=.*[a-z])(?=.*[A-Z])(?=.*[!@#\$%\^&\*]).{8,32}$/;
     // This regular expression ensures:
@@ -158,6 +178,37 @@ app.post("/user/register", async (req, res) => {
         error: error,
         message: "Could not create user"
       }
+    })
+  }
+});
+
+// LOGIN IN USER
+app.post("/users/login", async (req, res) => {
+  const { username, password } = req.body;
+  try {
+    const user = await User.findOne({ username });
+    if (user && bcrypt.compareSync(password, user.password)) {
+      res.status(201).json({
+        success: true,
+        response: {
+          username: user.username,
+          id: user._id,
+          accessToken: user.accessToken,
+          message: 'You are logged in, yay!'
+        }
+      })
+    } else {
+      res.status(404).json({
+        success: false,
+        response: {
+          message: 'Invalid credentials'
+        }
+      })
+    }
+  } catch (error) {
+    res.status(500).json({
+      success: false,
+      response: error
     })
   }
 });
