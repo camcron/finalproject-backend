@@ -1,14 +1,9 @@
 import express from "express";
 import cors from "cors";
-import mongoose from "mongoose";
 import dotenv from 'dotenv';
 dotenv.config();
 const apiKey = process.env.API_KEY
 const fetch = require('node-fetch');
-
-const mongoUrl = process.env.MONGO_URL || "mongodb://localhost/odyssey";
-mongoose.connect(mongoUrl, { useNewUrlParser: true, useUnifiedTopology: true });
-mongoose.Promise = Promise;
 
 // Defines the port the app will run on. Defaults to 8080, but can be overridden
 // when starting the server. Example command to overwrite PORT env variable value:
@@ -16,8 +11,15 @@ mongoose.Promise = Promise;
 const port = process.env.PORT || 8080;
 const app = express();
 
+const corsOptions = {
+  origin: '*', // Allow all origins
+  methods: ['GET', 'POST'], // Allow GET and POST requests
+  preflightContinue: false, // Enable preflight requests
+  optionsSuccessStatus: 204, // Return 204 status for successful preflight requests
+};
+
 // Add middlewares to enable cors and json body parsing
-app.use(cors());
+app.use(cors(corsOptions));
 app.use(express.json());
 app.options('*', cors())  // Enable CORS preflight for all routes
 
