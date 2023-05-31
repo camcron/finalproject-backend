@@ -19,6 +19,7 @@ const app = express();
 // Add middlewares to enable cors and json body parsing
 app.use(cors());
 app.use(express.json());
+app.options('*', cors())  // Enable CORS preflight for all routes
 
 // Start defining your routes here
 app.get("/", (req, res) => {
