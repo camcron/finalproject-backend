@@ -213,6 +213,41 @@ app.post("/users/login", async (req, res) => {
   }
 });
 
+// MIDDLEWARE TO AUTHENTICATE THE USER
+// SHOULD THIS BE MOVED UP TO MIDDLEWARES????????????????
+
+const authenticateUser = async (req, res, next) => {
+  const accessToken = req.header('Authorization');
+  try {
+    const user = await User.findOne({ accessToken });
+    if (user) {
+      next();
+    } else {
+      res.status(400).json({
+        success: false,
+        response: {
+          message: 'You need to log in'
+        }
+      });
+    }
+  } catch (error) {
+    res.status(500).json({
+      success: false,
+      response: error
+    });
+  }
+}
+
+// ENDPOINT ONLY AUTHENTICATED USERS CAN SEE
+app.get("/content", authenticateUser);
+app.get("/content", async (req, res) => {
+  res.status(200).json({
+    success: true,
+    response: {
+      message: 'Secret content here'
+    }
+  })
+})
 
 
 // Start the server
