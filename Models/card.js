@@ -7,6 +7,10 @@ const CardSchema = new mongoose.Schema({
     default: "HEJ",
     // minLength: 2,
     // maxLength: 50
+  },
+  content: {
+    type: String,
+    default: "CARD"
   }
   // createdAt: {
   //   type: Date,

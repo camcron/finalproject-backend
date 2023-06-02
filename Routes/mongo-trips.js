@@ -44,6 +44,7 @@ router.post("/trips", async (req, res) => {
   }
 })
 
+// DELETE TRIP?
 
 router.get("/trips", async (req, res) => {
     try {

@@ -25,7 +25,7 @@ router.post('/api/places', async (req, res) => {
 
 export default router;
 
-
+// Google photos??
 
 
   // POST request to Goggle Place Details
