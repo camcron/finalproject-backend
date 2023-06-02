@@ -1,0 +1,19 @@
+const mongoose = require('mongoose');
+
+const { Schema } = mongoose;
+const CardSchema = new mongoose.Schema({
+  message: {
+    type: String,
+    default: "HEJ",
+    // minLength: 2,
+    // maxLength: 50
+  },
+  createdAt: {
+    type: Date,
+    default: Date.now()
+  }
+});
+
+const Card = mongoose.model("Card", CardSchema);
+
+module.exports = Card;

@@ -3,8 +3,8 @@ const router = express.Router()
 import mongoose from "mongoose";
 import bcrypt from 'bcrypt'
 import dotenv from 'dotenv';
+// import authenticateUser from '../Middlewares/middlewares';
 dotenv.config();
-
 
 const User = require('../Models/user');
 
@@ -88,6 +88,28 @@ router.post("/users/register", async (req, res) => {
   }
 });
 
+const authenticateUser = async (req, res, next) => {
+  const accessToken = req.header('Authorization');
+  try {
+    const user = await User.findOne({ accessToken });
+    if (user) {
+      next();
+    } else {
+      res.status(400).json({
+        success: false,
+        response: {
+          message: 'You need to log in'
+        }
+      });
+    }
+  } catch (error) {
+    res.status(500).json({
+      success: false,
+      response: error
+    });
+  }
+}
+
 // LOGIN IN USER
 router.post("/users/login", async (req, res) => {
   const { username, password } = req.body;
@@ -119,30 +141,6 @@ router.post("/users/login", async (req, res) => {
   }
 });
 
-// MIDDLEWARE TO AUTHENTICATE THE USER
-// SHOULD THIS BE MOVED UP TO MIDDLEWARES????????????????
-
-const authenticateUser = async (req, res, next) => {
-  const accessToken = req.header('Authorization');
-  try {
-    const user = await User.findOne({ accessToken });
-    if (user) {
-      next();
-    } else {
-      res.status(400).json({
-        success: false,
-        response: {
-          message: 'You need to log in'
-        }
-      });
-    }
-  } catch (error) {
-    res.status(500).json({
-      success: false,
-      response: error
-    });
-  }
-}
 
 // ENDPOINT ONLY AUTHENTICATED USERS CAN SEE
 router.get("/content", authenticateUser);
