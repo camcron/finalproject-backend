@@ -13,9 +13,9 @@ const listEndpoints = require('express-list-endpoints');
 
 
 // Imports the routes for interacting with the files in the Router folder
-const googleRoute=require('./Routes/google-api');
-const mongoUsersRoute=require('./Routes/mongo-users');
-const mongoTripsRoute=require('./Routes/mongo-trips');
+import googleRoute from './Routes/google-api';
+import mongoUsersRoute from './Routes/mongo-users';
+import mongoTripsRoute from './Routes/mongo-trips';
 
 
 // Defines the options for CORS
@@ -33,7 +33,7 @@ app.use(express.json());
 app.options('*', cors())
 
 
-// Adds the file's routes to the application at the root path
+// Adds the Route's file's routes to the application at the root path
 app.use("/", googleRoute);
 app.use("/", mongoUsersRoute);
 app.use("/", mongoTripsRoute);

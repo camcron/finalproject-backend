@@ -1,4 +1,4 @@
-const mongoose = require('mongoose');
+import mongoose from 'mongoose';
 import crypto from 'crypto'
 
 const { Schema } = mongoose;

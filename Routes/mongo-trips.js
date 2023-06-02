@@ -2,10 +2,8 @@
 import express from "express";
 const router = express.Router()
 import mongoose from "mongoose";
-
-
 // const User = require('../Models/user');
-const Trip = require('../Models/trip');
+import Trip from '../Models/trip';
 // const Card = require('../Models/card');
 
 
@@ -18,17 +16,17 @@ mongoose.Promise = Promise;
 
 router.post("/trips", async (req, res) => {
   try {
-    const { name, previous, bucketlist, upcoming, activeuser, createdAt } = req.body;
+    const { name, activeuser } = req.body;
     // const accessToken = req.header("Authorization");
     // const user = await User.findOne({accessToken: accessToken});
     const newTrip = await new Trip({
       name: name, 
-      previous: previous,
-      bucketlist: bucketlist,
-      upcoming: upcoming,
+      // previous: previous,
+      // bucketlist: bucketlist,
+      // upcoming: upcoming,
       activeuser: activeuser,
-      createdAt: createdAt,
-      // cards: cards,
+      // createdAt: createdAt,
+      // cards: cards
     }).save();
     res.status(201).json({
       success: true, 
@@ -66,4 +64,37 @@ router.get("/trips", async (req, res) => {
       })
     }
   })
+
+
+  router.patch("/trips/:id", async (req, res) => {
+    const { id } = req.params;
   
+    try {
+      const { message } = req.body;
+      const newCard = await Card.findByIdAndUpdate(id, { message: message }, { new: true });
+  
+      if (newCard) {
+        res.status(201).json({
+          success: true,
+          response: {
+            message: "New card successfully saved to trip"
+          }
+        });
+      } else {
+        res.status(404).json({
+          success: false,
+          response: {
+            message: "Could not save card to trip"
+          }
+        })
+      };
+    } catch (err) {
+      res.status(400).json({
+        success: false,
+        message: `Error occurred while trying to update the like`,
+        response: err
+      });
+    }
+  });  
+  
+export default router;

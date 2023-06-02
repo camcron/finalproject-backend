@@ -1,5 +1,5 @@
-const mongoose = require('mongoose');
-import { CardSchema } from './card.js';
+import mongoose from 'mongoose';
+import CardSchema from './card.js';
 
 const { Schema } = mongoose;
 const TripSchema = new mongoose.Schema({
@@ -27,8 +27,8 @@ const TripSchema = new mongoose.Schema({
   createdAt: {
     type: Date,
     default: Date.now(),
-  }
-  // cards: [CardSchema]
+  },
+  cards: [CardSchema]
 });
 
 const Trip = mongoose.model("Trip", TripSchema);

@@ -6,7 +6,7 @@ import dotenv from 'dotenv';
 // import authenticateUser from '../Middlewares/middlewares';
 dotenv.config();
 
-const User = require('../Models/user');
+import User from '../Models/user';
 
 const mongoUrl = process.env.MONGO_URL || "mongodb://localhost/finalproject";
 mongoose.connect(mongoUrl, { useNewUrlParser: true, useUnifiedTopology: true });
@@ -153,4 +153,4 @@ router.get("/content", async (req, res) => {
   })
 })
 
-module.exports = router;
+export default router;

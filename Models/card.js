@@ -1,4 +1,4 @@
-const mongoose = require('mongoose');
+import mongoose from 'mongoose';
 
 const { Schema } = mongoose;
 const CardSchema = new mongoose.Schema({
@@ -7,13 +7,13 @@ const CardSchema = new mongoose.Schema({
     default: "HEJ",
     // minLength: 2,
     // maxLength: 50
-  },
-  createdAt: {
-    type: Date,
-    default: Date.now()
   }
+  // createdAt: {
+  //   type: Date,
+  //   default: Date.now()
+  // }
 });
 
 const Card = mongoose.model("Card", CardSchema);
 
-module.exports = Card;
+export default CardSchema;

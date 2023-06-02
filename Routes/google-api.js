@@ -1,6 +1,6 @@
 const apiKey = process.env.API_KEY
 import express from "express";
-const fetch = require('node-fetch');
+import fetch from 'node-fetch';
 const app = express();
 const router=express.Router()
 
@@ -23,7 +23,10 @@ router.post('/api/places', async (req, res) => {
     }
   });
 
-  module.exports=router;
+export default router;
+
+
+
 
   // POST request to Goggle Place Details
 // using the place_id from the frontend
