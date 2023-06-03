@@ -187,7 +187,7 @@ router.delete("/trips/:tripId", authenticateUser, async (req, res) => {
     });
   }
 })
-/////////////////////////////////////////////////////////////////////
+
 
 // PATCH to add a new card to a single trip
 router.patch("/trips/:tripId/cards", authenticateUser, async (req, res) => {
@@ -246,17 +246,17 @@ router.patch("/trips/:tripId/cards/:cardId", authenticateUser, async (req, res) 
       });
     }
 
-    const updatedCard = trip.cards.id(cardId);
+    const updateCard = trip.cards.id(cardId);
 
-    if (!updatedCard) {
+    if (!updateCard) {
       return res.status(404).json({
         success: false,
         message: "Card could not be found",
       });
     }
 
-      updatedCard.cardComment = cardComment;
-      updatedCard.cardStars = cardStars;
+      updateCard.cardComment = cardComment;
+      updateCard.cardStars = cardStars;
 
       await trip.save()
     
@@ -277,6 +277,49 @@ router.patch("/trips/:tripId/cards/:cardId", authenticateUser, async (req, res) 
   });
 
 
+// DELETE single card in a Trip's array of Cards
+router.delete("/trips/:tripId/cards/:cardId", authenticateUser, async (req, res) => {
+  const { tripId, cardId } = req.params;
+
+  try {
+    const trip = await Trip.findById(tripId);
+
+    if (!trip) {
+      return res.status(404).json({
+        success: false,
+        message: "Trip could not be found",
+      });
+    }
+
+    const card = trip.cards.id(cardId);
+
+    if (!card) {
+      return res.status(404).json({
+        success: false,
+        message: "Card could not be found",
+      });
+    }
+
+    await Trip.findByIdAndUpdate(
+      tripId, 
+      { $pull: { cards: { _id: cardId } } }, 
+      { new: true }
+    ); 
+
+      res.status(200).json({
+        success: true, 
+        response: {
+          message: "Successfully deleted card",
+      } 
+    })
+  } catch (error) {
+    res.status(500).json({
+      success: false, 
+      response: error, 
+      message: "An error occurred while trying to delete a card"
+    });
+  }
+})
 
     /*
     if (id === loggedinUserId.toString()) {
