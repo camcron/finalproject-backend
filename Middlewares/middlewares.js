@@ -15,7 +15,7 @@ const authenticateUser = async (req, res, next) => {
       });
     }
 
-    const loggedinuser = await User.findOne({ accessToken });
+    const loggedinuser = await User.findOne({ accessToken: accessToken });
     if (loggedinuser) {
       req.accessToken = accessToken;
       req.loggedinuser = loggedinuser;
