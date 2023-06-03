@@ -16,10 +16,29 @@ const UserSchema = new mongoose.Schema({
   accessToken: {
     type: String,
     default: () => crypto.randomBytes(128).toString('hex')
+  },
+  profileName: {
+    type: String,
+    default: ""
+  },
+  profileText: {
+    type: String,
+    default: ""
+    // trim: true
+    // minlength: 10,
+    // maxlength: 250
+  },
+  profilePicture: {
+    type: String,
+    default: "https://i.postimg.cc/vmZr7ryp/istockphoto-470100848-612x612.jpg"
+    // data: Buffer, What does this mean??
+  },
+  profileInstagram: {
+    type: String,
+    default: ""
   }
 });
 
 const User = mongoose.model("User", UserSchema);
 
-// module.exports = User;
 export default User;

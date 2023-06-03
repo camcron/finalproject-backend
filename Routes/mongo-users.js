@@ -3,8 +3,8 @@ const router = express.Router()
 import mongoose from "mongoose";
 import bcrypt from 'bcrypt'
 import dotenv from 'dotenv';
-// import authenticateUser from '../Middlewares/middlewares';
 dotenv.config();
+import authenticateUser from '../Middlewares/middlewares'
 
 import User from '../Models/user';
 
@@ -21,7 +21,7 @@ router.get("/users", async (req, res) => {
     res.status(200).json({
       success: true,
       body: allUsers,
-      message: "hej hej",
+      message: "All users listed",
     })
   }
   } catch (e) {
@@ -74,6 +74,10 @@ router.post("/users/register", async (req, res) => {
         username: newUser.username,
         id: newUser._id,
         accessToken: newUser.accessToken,
+        profileName: newUser.profileName,
+        profileText: newUser.profileText,
+        profilePicture: newUser.profilePicture,
+        profileInstagram: newUser.profileInstagram,
         message: "User successfully created"
       }
     })
@@ -88,28 +92,6 @@ router.post("/users/register", async (req, res) => {
   }
 });
 
-const authenticateUser = async (req, res, next) => {
-  const accessToken = req.header('Authorization');
-  try {
-    const user = await User.findOne({ accessToken });
-    if (user) {
-      next();
-    } else {
-      res.status(400).json({
-        success: false,
-        response: {
-          message: 'You need to log in'
-        }
-      });
-    }
-  } catch (error) {
-    res.status(500).json({
-      success: false,
-      response: error
-    });
-  }
-}
-
 // LOGIN IN USER
 router.post("/users/login", async (req, res) => {
   const { username, password } = req.body;
@@ -122,6 +104,10 @@ router.post("/users/login", async (req, res) => {
           username: user.username,
           id: user._id,
           accessToken: user.accessToken,
+          profileName: user.profileName,
+          profileText: user.profileText,
+          profilePicture: user.profilePicture,
+          profileInstagram: user.profileInstagram,
           message: 'You are logged in, yay!'
         }
       })
@@ -141,16 +127,75 @@ router.post("/users/login", async (req, res) => {
   }
 });
 
-
-// ENDPOINT ONLY AUTHENTICATED USERS CAN SEE - REMOVE?
-router.get("/content", authenticateUser);
-router.get("/content", async (req, res) => {
-  res.status(200).json({
-    success: true,
-    response: {
-      message: 'Secret content here'
+// Find singleUser by ID
+router.get("/users/:id", authenticateUser);
+router.get("/users/:id", async (req, res) => {
+  const { id } = req.params; // Get the user id from the request parameters
+  try {
+    const singleUser = await User.findById({ id });
+    if (singleUser) {
+      res.status(200).json({
+        success: true,
+        body: singleUser,
+        message: "Single user listed",
+      })
+    } else {
+      res.status(404).json({
+        success: false,
+        response: {
+          message: 'Could not find user'
+        }
+      })
     }
-  })
+    } catch (error) {
+      res.status(500).json({
+        success: false,
+        response: error,
+        message: "An error occurred while fetching the user data",
+      })
+    }
 })
+
+router.patch("/users/:id", authenticateUser);
+router.patch("/users/:id", async (req, res) => {
+  try {
+    const { id } = req.params; // Get the user id from the request parameters
+    const { profileName, profileText, profilePicture, profileInstagram } = req.body; 
+
+    // Find the trip by its id and update it using $push operator to add a new card to the cards array
+    const updatedUser = await User.findByIdAndUpdate(
+      id,
+      {
+        profileName: profileName,
+        profileText: profileText,
+        profilePicture: profilePicture,
+        profileInstagram: profileInstagram
+      },
+      { new: true }
+    );
+    if (updatedUser) {
+      res.status(200).json({
+        success: true,
+        response: {
+          message: "User successfully updated",
+          data: updatedUser,
+        },
+      });
+    } else {
+      res.status(404).json({
+        success: false,
+        response: {
+          message: "User could not be updated",
+        },
+      });
+    }
+  } catch (e) {
+    res.status(500).json({
+      success: false,
+      response: e,
+      message: "An error occurred while updating the user",
+    });
+  }
+});
 
 export default router;

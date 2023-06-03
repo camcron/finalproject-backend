@@ -7,7 +7,7 @@ const authenticateUser = async (req, res, next) => {
     try {
       const loggedinuser = await User.findOne({ accessToken });
       if (loggedinuser) {
-        // req.accessToken = accessToken; // Add accessToken to req object
+        req.accessToken = accessToken; // Add accessToken to req object
         req.loggedinuser = loggedinuser; // Add user to req object
         next();
       } else {
