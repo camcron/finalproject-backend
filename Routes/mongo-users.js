@@ -129,10 +129,10 @@ router.post("/users/login", async (req, res) => {
 });
 
 // Find singleUser by ID
-router.get("/users/:userId", authenticateUser);
-router.get("/users/:userId", async (req, res) => {
+router.get("/users/:userId", authenticateUser, async (req, res) => {
   const { userId } = req.params; // Get the user id from the request parameters
   const loggedinUserId = req.loggedinuser._id; // Get the ID of the logged-in user
+
   try {
     if (userId === loggedinUserId.toString()) {
       // Only allow access if the requested ID matches the logged-in user's ID
@@ -169,10 +169,11 @@ router.get("/users/:userId", async (req, res) => {
     }
 })
 
-router.patch("/users/:userId", authenticateUser);
-router.patch("/users/:userId", async (req, res) => {
+
+router.patch("/users/:userId", authenticateUser, async (req, res) => {
+  const { userId } = req.params; // Get the user id from the request parameters
+
   try {
-    const { userId } = req.params; // Get the user id from the request parameters
     const { profileName, profileText, profilePicture, profileInstagram } = req.body; 
     const loggedinUserId = req.loggedinuser._id; // Get the ID of the logged-in user
 
