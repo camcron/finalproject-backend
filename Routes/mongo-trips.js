@@ -127,21 +127,35 @@ router.get("/trips", async (req, res) => {
   });
 
   
-router.patch("/trips/:tripId/cards/:cardId", authenticateUser);
-router.patch("/trips/:tripId/cards/:cardId", async (req, res) => {
+// router.patch("/trips/:tripId/cards/:cardId", authenticateUser);
+router.patch("/trips/:tripId/cards/:cardId", authenticateUser, async (req, res) => {
   try {
-    const { cardId } = req.params; // Get the user id from the request parameters
+    const { tripId, cardId } = req.params; // Get the user id from the request parameters
     const { cardComment, cardStars } = req.body; 
 
-    const updatedCard = await Card.findByIdAndUpdate(
-      cardId,
-      { 
-        cardComment: cardComment, 
-        cardStars: cardStars 
-      },
-      { new: true } 
-    );
-    if (updatedCard) {
+    const trip = await Trip.findById(tripId);
+
+    if (!trip) {
+      return res.status(404).json({
+        success: false,
+        message: "Trip not found",
+      });
+    }
+
+    const updatedCard = trip.cards.id(cardId);
+
+    if (!updatedCard) {
+      return res.status(404).json({
+        success: false,
+        message: "Card not found",
+      });
+    }
+
+      updatedCard.cardComment = cardComment;
+      updatedCard.cardStars = cardStars;
+
+      await trip.save()
+    
       res.status(200).json({
         success: true,
         response: {
@@ -149,14 +163,7 @@ router.patch("/trips/:tripId/cards/:cardId", async (req, res) => {
           data: updatedCard,
         },
       });
-    } else {
-      res.status(404).json({
-        success: false,
-        response: {
-          message: "Card could not be updated",
-        },
-      });
-    }} catch (error) {
+    } catch (error) {
       res.status(500).json({
         success: false,
         response: error,
@@ -164,6 +171,7 @@ router.patch("/trips/:tripId/cards/:cardId", async (req, res) => {
       });
     }
   });
+
 
 
     /*
