@@ -13,6 +13,10 @@ const UserSchema = new mongoose.Schema({
     required: true,
     // minLength: 6
   },
+  _id: {
+    type: String,
+    required: true 
+  },
   accessToken: {
     type: String,
     default: () => crypto.randomBytes(128).toString('hex')

@@ -132,9 +132,9 @@ router.post("/users/login", async (req, res) => {
 router.get("/users/:id", authenticateUser);
 router.get("/users/:id", async (req, res) => {
   const { id } = req.params; // Get the user id from the request parameters
-  const loggedinUserId = req.loggedinuser._id; // Get the ID of the logged-in user
+  // const loggedinUserId = req.loggedinuser._id; // Get the ID of the logged-in user
   try {
-    if (id === loggedinUserId) {
+    if (id == req.loggedinuser._id) {
       // Only allow access if the requested ID matches the logged-in user's ID
       const singleUser = await User.findById(id);
       if (singleUser) {

@@ -4,6 +4,7 @@ import User from '../Models/user';
 
 const authenticateUser = async (req, res, next) => {
   const accessToken = req.header('Authorization');
+  // console.log('accessToken:', accessToken)
   try {
     if (!accessToken) {
       return res.status(401).json({
