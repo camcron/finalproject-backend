@@ -3,10 +3,11 @@ const router = express.Router()
 import mongoose from "mongoose";
 import bcrypt from 'bcrypt'
 import dotenv from 'dotenv';
-dotenv.config();
 import authenticateUser from '../Middlewares/middlewares'
-
 import User from '../Models/user';
+
+dotenv.config();
+
 
 const mongoUrl = process.env.MONGO_URL || "mongodb://localhost/finalproject";
 mongoose.connect(mongoUrl, { useNewUrlParser: true, useUnifiedTopology: true });
@@ -131,21 +132,33 @@ router.post("/users/login", async (req, res) => {
 router.get("/users/:id", authenticateUser);
 router.get("/users/:id", async (req, res) => {
   const { id } = req.params; // Get the user id from the request parameters
+  const loggedinUserId = req.loggedinuser._id; // Get the ID of the logged-in user
   try {
-    const singleUser = await User.findById({ id });
-    if (singleUser) {
-      res.status(200).json({
-        success: true,
-        body: singleUser,
-        message: "Single user listed",
-      })
+    if (id === loggedinUserId) {
+      // Only allow access if the requested ID matches the logged-in user's ID
+      const singleUser = await User.findById(id);
+      if (singleUser) {
+        res.status(200).json({
+          success: true,
+          body: singleUser,
+          message: "Single user listed",
+        });
+      } else {
+        res.status(404).json({
+          success: false,
+          response: {
+            message: 'Could not find user'
+          }
+        });
+      }
     } else {
-      res.status(404).json({
+      // If the requested ID does not match the logged-in user's ID
+      res.status(403).json({
         success: false,
         response: {
-          message: 'Could not find user'
+          message: 'You are not authorized to access this user information'
         }
-      })
+      });
     }
     } catch (error) {
       res.status(500).json({
@@ -161,41 +174,63 @@ router.patch("/users/:id", async (req, res) => {
   try {
     const { id } = req.params; // Get the user id from the request parameters
     const { profileName, profileText, profilePicture, profileInstagram } = req.body; 
+    const loggedinUserId = req.loggedinuser._id; // Get the ID of the logged-in user
 
-    // Find the trip by its id and update it using $push operator to add a new card to the cards array
-    const updatedUser = await User.findByIdAndUpdate(
-      id,
-      {
-        profileName: profileName,
-        profileText: profileText,
-        profilePicture: profilePicture,
-        profileInstagram: profileInstagram
-      },
-      { new: true }
-    );
-    if (updatedUser) {
-      res.status(200).json({
-        success: true,
-        response: {
-          message: "User successfully updated",
-          data: updatedUser,
+    if (id === loggedinUserId) {
+      // Only allow access if the requested ID matches the logged-in user's ID
+      const updatedUser = await User.findByIdAndUpdate(
+        id,
+        {
+          profileName: profileName,
+          profileText: profileText,
+          profilePicture: profilePicture,
+          profileInstagram: profileInstagram
         },
-      });
+        { new: true }
+      );
+      if (updatedUser) {
+        res.status(200).json({
+          success: true,
+          response: {
+            message: "User successfully updated",
+            data: updatedUser,
+          },
+        });
+      } else {
+        res.status(404).json({
+          success: false,
+          response: {
+            message: "User could not be updated",
+          },
+        });
+      }
     } else {
-      res.status(404).json({
+      // If the requested ID does not match the logged-in user's ID
+      res.status(403).json({
         success: false,
         response: {
-          message: "User could not be updated",
-        },
+          message: 'You are not authorized to update this user'
+        }
       });
     }
-  } catch (e) {
+  } catch (error) {
     res.status(500).json({
       success: false,
-      response: e,
+      response: error,
       message: "An error occurred while updating the user",
     });
   }
+});
+
+// Endpoint to get logged-in user
+router.get("/users/me", authenticateUser);
+router.get("/users/me", (req, res) => {
+  const loggedinUser = req.loggedinuser;
+  res.status(200).json({
+    success: true,
+    body: loggedinUser,
+    message: "Logged-in user information",
+  });
 });
 
 export default router;
