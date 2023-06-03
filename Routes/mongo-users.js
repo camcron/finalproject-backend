@@ -134,7 +134,7 @@ router.get("/users/:id", async (req, res) => {
   const { id } = req.params; // Get the user id from the request parameters
   const loggedinUserId = req.loggedinuser._id; // Get the ID of the logged-in user
   try {
-    if (id == loggedinUserId) {
+    if (id === loggedinUserId.toString()) {
       // Only allow access if the requested ID matches the logged-in user's ID
       const singleUser = await User.findById(id);
       if (singleUser) {
@@ -176,7 +176,7 @@ router.patch("/users/:id", async (req, res) => {
     const { profileName, profileText, profilePicture, profileInstagram } = req.body; 
     const loggedinUserId = req.loggedinuser._id; // Get the ID of the logged-in user
 
-    if (id == loggedinUserId) {
+    if (id === loggedinUserId.toString()) {
       // Only allow access if the requested ID matches the logged-in user's ID
       const updatedUser = await User.findByIdAndUpdate(
         id,
