@@ -2,9 +2,7 @@ import authenticateUser from '../Middlewares/middlewares'
 import express from "express";
 const router = express.Router()
 import mongoose from "mongoose";
-// const User = require('../Models/user');
 import Trip from '../Models/trip';
-// const Card = require('../Models/card');
 
 
 const mongoUrl = process.env.MONGO_URL || "mongodb://localhost/finalproject";
@@ -17,19 +15,14 @@ router.post("/trips", authenticateUser);
 router.post("/trips", async (req, res) => {
   try {
     const { name } = req.body;
-    const accessToken = req.accessToken; // Access the accessToken from req object
+    // const accessToken = req.accessToken; // Access the accessToken from req object
     const loggedinuser = req.loggedinuser; // Access the user from req object
 
     // const accessToken = req.header("Authorization");
     // const loggedinuser = await User.findOne({accessToken: accessToken});
     const newTrip = await new Trip({
       name: name, 
-      // previous: previous,
-      // bucketlist: bucketlist,
-      // upcoming: upcoming,
       activeuser: loggedinuser._id,
-      // createdAt: createdAt,
-      // cards: cards
     }).save();
     if (newTrip) {
       res.status(201).json({
