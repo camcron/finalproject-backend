@@ -142,7 +142,7 @@ router.post("/users/login", async (req, res) => {
 });
 
 
-// ENDPOINT ONLY AUTHENTICATED USERS CAN SEE
+// ENDPOINT ONLY AUTHENTICATED USERS CAN SEE - REMOVE?
 router.get("/content", authenticateUser);
 router.get("/content", async (req, res) => {
   res.status(200).json({

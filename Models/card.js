@@ -11,11 +11,11 @@ const CardSchema = new mongoose.Schema({
   content: {
     type: String,
     default: "CARD"
+  },
+  createdAt: {
+    type: Date,
+    default: Date.now()
   }
-  // createdAt: {
-  //   type: Date,
-  //   default: Date.now()
-  // }
 });
 
 const Card = mongoose.model("Card", CardSchema);

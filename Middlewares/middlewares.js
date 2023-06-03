@@ -1,4 +1,4 @@
-import { User } from '../Models/user.js';
+import User from '../Models/user';
 
 // MIDDLEWARE TO AUTHENTICATE THE USER
 
@@ -7,6 +7,8 @@ const authenticateUser = async (req, res, next) => {
     try {
       const user = await User.findOne({ accessToken });
       if (user) {
+        req.accessToken = accessToken; // Add accessToken to req object
+        req.user = user; // Add user to req object
         next();
       } else {
         res.status(400).json({

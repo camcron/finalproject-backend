@@ -23,7 +23,7 @@ const TripSchema = new mongoose.Schema({
   },
   activeuser: {
     type: String,
-    default: "test"
+    default: "not logged in maybe"
   },
   createdAt: {
     type: Date,
