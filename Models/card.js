@@ -2,15 +2,38 @@ import mongoose from 'mongoose';
 
 const { Schema } = mongoose;
 const CardSchema = new mongoose.Schema({
-  message: {
+  cardIcon: {
     type: String,
-    default: "HEJ",
-    // minLength: 2,
-    // maxLength: 50
+    default: ""
   },
-  content: {
+  cardName: {
     type: String,
-    default: "CARD"
+    default: ""
+  },
+  cardPhotoRef: {
+    type: String,
+    default: ""
+  },
+  cardPlaceId: {
+    type: String,
+    default: ""
+  },
+  cardRating: {
+    type: Number,
+    default: null
+  },
+  cardVicinity: {
+    type: String,
+    default: ""
+  },
+  cardComment: {
+    type: String,
+    default: "",
+    maxLength: 100
+  },
+  cardStars: {
+    type: Number,
+    default: 0
   },
   createdAt: {
     type: Date,

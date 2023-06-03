@@ -129,14 +129,14 @@ router.post("/users/login", async (req, res) => {
 });
 
 // Find singleUser by ID
-router.get("/users/:id", authenticateUser);
-router.get("/users/:id", async (req, res) => {
-  const { id } = req.params; // Get the user id from the request parameters
+router.get("/users/:userId", authenticateUser);
+router.get("/users/:userId", async (req, res) => {
+  const { userId } = req.params; // Get the user id from the request parameters
   const loggedinUserId = req.loggedinuser._id; // Get the ID of the logged-in user
   try {
-    if (id === loggedinUserId.toString()) {
+    if (userId === loggedinUserId.toString()) {
       // Only allow access if the requested ID matches the logged-in user's ID
-      const singleUser = await User.findById(id);
+      const singleUser = await User.findById(userId);
       if (singleUser) {
         res.status(200).json({
           success: true,
@@ -169,17 +169,17 @@ router.get("/users/:id", async (req, res) => {
     }
 })
 
-router.patch("/users/:id", authenticateUser);
-router.patch("/users/:id", async (req, res) => {
+router.patch("/users/:userId", authenticateUser);
+router.patch("/users/:userId", async (req, res) => {
   try {
-    const { id } = req.params; // Get the user id from the request parameters
+    const { userId } = req.params; // Get the user id from the request parameters
     const { profileName, profileText, profilePicture, profileInstagram } = req.body; 
     const loggedinUserId = req.loggedinuser._id; // Get the ID of the logged-in user
 
-    if (id === loggedinUserId.toString()) {
+    if (userId === loggedinUserId.toString()) {
       // Only allow access if the requested ID matches the logged-in user's ID
       const updatedUser = await User.findByIdAndUpdate(
-        id,
+        userId,
         {
           profileName: profileName,
           profileText: profileText,
@@ -222,7 +222,7 @@ router.patch("/users/:id", async (req, res) => {
   }
 });
 
-// Endpoint to get logged-in user
+// Endpoint to get logged-in user  --- REMOVE THIS!
 router.get("/users/me", authenticateUser);
 router.get("/users/me", (req, res) => {
   const loggedinUser = req.loggedinuser;

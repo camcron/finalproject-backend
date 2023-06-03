@@ -3,27 +3,26 @@ import CardSchema from './card.js';
 
 const { Schema } = mongoose;
 const TripSchema = new mongoose.Schema({
-  name: {
+  tripName: {
     type: String,
     required: true,
     // minLength: 2,
     // maxLength: 50
   },
-  previous: {
+  tripPrevious: {
     type: Boolean,
     default: false,
   },
-  bucketlist: {
+  tripBucketlist: {
     type: Boolean,
     default: false,
   },
-  upcoming: {
+  tripUpcoming: {
     type: Boolean,
     default: false,
   },
-  activeuser: {
-    type: String,
-    default: "not logged in maybe"
+  tripActiveuser: {
+    type: String
   },
   createdAt: {
     type: Date,

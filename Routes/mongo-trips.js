@@ -13,18 +13,18 @@ mongoose.Promise = Promise;
 router.post("/trips", authenticateUser);
 router.post("/trips", async (req, res) => {
   try {
-    const { name } = req.body;
+    const { tripName } = req.body;
     const loggedinuser = req.loggedinuser; // Access the currently logged in user from req object
 
     const newTrip = await new Trip({
-      name: name, 
-      activeuser: loggedinuser._id,
+      tripName: tripName, 
+      tripActiveuser: loggedinuser._id,
     }).save();
     if (newTrip) {
       res.status(201).json({
         success: true, 
         response: {
-          message: "new trip successfully created",
+          message: "New trip successfully created",
           data: newTrip
       } 
       })
@@ -32,15 +32,15 @@ router.post("/trips", async (req, res) => {
       res.status(404).json({
         success: false, 
         response: {
-          message: "trip not created",
+          message: "Trip not created",
       } 
       })
     }
-  } catch (e) {
+  } catch (error) {
     res.status(500).json({
       success: false, 
-      response: e, 
-      message: "not working"
+      response: error, 
+      message: "An error occurred while trying to create a new trip"
     });
   }
 })
@@ -58,19 +58,19 @@ router.get("/trips", async (req, res) => {
         }
       })
     }
-    } catch (e) {
+    } catch (error) {
       res.status(500).json({
         success: false,
-        response: e
+        response: error
       })
     }
   })
 
 
-  router.get("/trips/:id", async (req, res) => {
-    const { id } = req.params; // Get the trip id from the request parameters
+  router.get("/trips/:tripId", async (req, res) => {
+    const { tripId } = req.params; // Get the trip id from the request parameters
     try {
-    const singleTrip = await Trip.findById(id);
+    const singleTrip = await Trip.findById(tripId);
     if (singleTrip) {
       res.status(200).json({
         success: true,
@@ -80,24 +80,25 @@ router.get("/trips", async (req, res) => {
         }
       })
     }
-    } catch (e) {
+    } catch (error) {
       res.status(500).json({
         success: false,
-        response: e
+        response: error
       })
     }
   })
 
 
-  router.patch("/trips/:id/cards", async (req, res) => {
+  router.patch("/trips/:tripId/cards", async (req, res) => {
     try {
-      const { id } = req.params; // Get the trip id from the request parameters
-      const { message, content } = req.body; // Get the fields for the new Card from the request body
+      const { tripId } = req.params; // Get the trip id from the request parameters
+      // const { cardComment, cardStars } = req.body; // Get the fields for the new Card from the request body
+      // const { cardIcon, cardName, cardPhotoRef, cardPlaceId, cardRating, cardVicinity } = req.body;
   
       // Find the trip by its id and update it using $push operator to add a new card to the cards array
       const updatedTrip = await Trip.findByIdAndUpdate(
-        id,
-        { $push: { cards: { message, content } } },
+        tripId,
+        { $push: { cards: {} } },
         { new: true } // To return the updated trip document
       );
       if (updatedTrip) {
@@ -116,13 +117,101 @@ router.get("/trips", async (req, res) => {
           },
         });
       }
-    } catch (e) {
+    } catch (error) {
       res.status(500).json({
         success: false,
-        response: e,
+        response: error,
         message: "An error occurred while adding the card to the trip",
       });
     }
   });
+
+  
+router.patch("/trips/:tripId/cards/:cardId", authenticateUser);
+router.patch("/trips/:tripId/cards/:cardId", async (req, res) => {
+  try {
+    const { cardId } = req.params; // Get the user id from the request parameters
+    const { cardComment, cardStars } = req.body; 
+
+    const updatedCard = await Card.findByIdAndUpdate(
+      cardId,
+      { 
+        cardComment: cardComment, 
+        cardStars: cardStars 
+      },
+      { new: true } 
+    );
+    if (updatedCard) {
+      res.status(200).json({
+        success: true,
+        response: {
+          message: "Card successfully updated",
+          data: updatedCard,
+        },
+      });
+    } else {
+      res.status(404).json({
+        success: false,
+        response: {
+          message: "Card could not be updated",
+        },
+      });
+    }} catch (error) {
+      res.status(500).json({
+        success: false,
+        response: error,
+        message: "An error occurred while updating the card",
+      });
+    }
+  });
+
+
+    /*
+    if (id === loggedinUserId.toString()) {
+      // Only allow access if the requested ID matches the logged-in user's ID
+      const updatedUser = await User.findByIdAndUpdate(
+        id,
+        {
+          profileName: profileName,
+          profileText: profileText,
+          profilePicture: profilePicture,
+          profileInstagram: profileInstagram
+        },
+        { new: true }
+      );
+      if (updatedUser) {
+        res.status(200).json({
+          success: true,
+          response: {
+            message: "User successfully updated",
+            data: updatedUser,
+          },
+        });
+      } else {
+        res.status(404).json({
+          success: false,
+          response: {
+            message: "User could not be updated",
+          },
+        });
+      }
+    } else {
+      // If the requested ID does not match the logged-in user's ID
+      res.status(403).json({
+        success: false,
+        response: {
+          message: 'You are not authorized to update this user'
+        }
+      });
+    }
+  } catch (error) {
+    res.status(500).json({
+      success: false,
+      response: error,
+      message: "An error occurred while updating the user",
+    });
+  }
+});
+*/
   
 export default router;
