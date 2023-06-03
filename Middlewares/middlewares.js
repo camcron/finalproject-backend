@@ -5,10 +5,10 @@ import User from '../Models/user';
 const authenticateUser = async (req, res, next) => {
     const accessToken = req.header('Authorization');
     try {
-      const user = await User.findOne({ accessToken });
-      if (user) {
+      const loggedinuser = await User.findOne({ accessToken });
+      if (loggedinuser) {
         req.accessToken = accessToken; // Add accessToken to req object
-        req.user = user; // Add user to req object
+        req.loggedinuser = loggedinuser; // Add user to req object
         next();
       } else {
         res.status(400).json({

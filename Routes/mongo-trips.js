@@ -18,7 +18,7 @@ router.post("/trips", async (req, res) => {
   try {
     const { name } = req.body;
     const accessToken = req.accessToken; // Access the accessToken from req object
-    const loggedinuser = req.user; // Access the user from req object
+    const loggedinuser = req.loggedinuser; // Access the user from req object
 
     // const accessToken = req.header("Authorization");
     // const loggedinuser = await User.findOne({accessToken: accessToken});
