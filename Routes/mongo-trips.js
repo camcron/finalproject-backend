@@ -45,11 +45,13 @@ router.post("/trips", authenticateUser, async (req, res) => {
   }
 })
 
-
-// GET all trips
+  // GET all trips only from logged in user
 router.get("/trips", authenticateUser, async (req, res) => {
+  const loggedinUserId = req.loggedinuser._id; // Get the ID of the logged-in user
+
   try {
-    const allTrips = await Trip.find();
+    const allTrips = await Trip.find({ tripActiveuser: loggedinUserId });
+    // const allTrips = await Trip.find();
     
       if (allTrips) {
         res.status(200).json({
