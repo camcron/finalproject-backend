@@ -198,12 +198,12 @@ router.patch("/trips/:tripId/cards", authenticateUser, async (req, res) => {
   try {
     // Get the trip id from the request parameters
     // const { cardComment, cardStars } = req.body; // Get the fields for the new Card from the request body
-    // const { cardIcon, cardName, cardPhotoRef, cardPlaceId, cardRating, cardVicinity } = req.body;
+    const { cardIcon, cardName, cardPhotoRef, cardPlaceId, cardRating, cardVicinity } = req.body;
 
     // Find the trip by its id and update it using $push operator to add a new card to the cards array
     const updatedTrip = await Trip.findByIdAndUpdate(
       tripId,
-      { $push: { cards: {} } },
+      { $push: { cards: { cardIcon, cardName, cardPhotoRef, cardPlaceId, cardRating, cardVicinity } } },
       { new: true } // To return the updated trip document
     );
     if (updatedTrip) {
@@ -266,7 +266,7 @@ router.patch("/trips/:tripId/cards/:cardId", authenticateUser, async (req, res) 
         success: true,
         response: {
           message: "Card successfully updated",
-          data: updatedCard,
+          data: updateCard,
         },
       });
     } catch (error) {
