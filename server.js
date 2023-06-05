@@ -21,7 +21,7 @@ import mongoTripsRoute from './Routes/mongo-trips';
 // Defines the options for CORS
 const corsOptions = {
   origin: '*', // Allow all origins
-  methods: ['GET', 'POST'], // Allow GET and POST requests
+  methods: ['GET', 'POST', 'PATCH', 'DELETE'], // Allow GET and POST requests
   preflightContinue: false, // Enable preflight requests
   optionsSuccessStatus: 204, // Return 204 status for successful preflight requests
 };
