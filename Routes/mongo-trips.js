@@ -161,34 +161,37 @@ router.patch("/trips/:tripId", authenticateUser, async (req, res) => {
 // DELETE single trip
 router.delete("/trips/:tripId", authenticateUser, async (req, res) => {
   const { tripId } = req.params;
+  console.log("tripId:", tripId);
 
   try {
-
-    const deleteTrip = await Trip.findByIdAndDelete(tripId)
+    const deleteTrip = await Trip.findByIdAndDelete(tripId);
+    console.log("deleteTrip:", deleteTrip);
 
     if (deleteTrip) {
       res.status(201).json({
-        success: true, 
+        success: true,
         response: {
           message: "Successfully deleted trip",
-      } 
-      })
+        },
+      });
     } else {
       res.status(404).json({
-        success: false, 
+        success: false,
         response: {
           message: "Trip could not be deleted",
-      } 
-      })
+        },
+      });
     }
   } catch (error) {
+    console.log("Error deleting trip:", error);
     res.status(500).json({
-      success: false, 
-      response: error, 
-      message: "An error occurred while trying to delete a trip"
+      success: false,
+      response: error,
+      message: "An error occurred while trying to delete a trip",
     });
   }
-})
+});
+
 
 
 // PATCH to add a new card to a single trip
