@@ -223,15 +223,5 @@ router.patch("/users/:userId", authenticateUser, async (req, res) => {
   }
 });
 
-// Endpoint to get logged-in user  --- REMOVE THIS!
-router.get("/users/me", authenticateUser);
-router.get("/users/me", (req, res) => {
-  const loggedinUser = req.loggedinuser;
-  res.status(200).json({
-    success: true,
-    body: loggedinUser,
-    message: "Logged-in user information",
-  });
-});
 
 export default router;
