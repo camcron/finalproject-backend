@@ -6,8 +6,8 @@ const router=express.Router()
 
 // Getting the lng, lat from the frontend to pass to PLaces API
 router.post('/api/places', async (req, res) => {
-    const { lng, lat } = req.body;
-    const placesUrl = `https://maps.googleapis.com/maps/api/place/nearbysearch/json?location=${lat},${lng}&type=tourist_attraction&radius=1500&key=${apiKey}`;
+    const { lng, lat, selectedFilter } = req.body;
+    const placesUrl = `https://maps.googleapis.com/maps/api/place/nearbysearch/json?location=${lat},${lng}&type=${selectedFilter}&radius=25000&key=${apiKey}`;
   
     try {
       const placesResponse = await fetch(placesUrl);
