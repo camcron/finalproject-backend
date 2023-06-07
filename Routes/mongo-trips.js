@@ -10,6 +10,7 @@ mongoose.connect(mongoUrl, { useNewUrlParser: true, useUnifiedTopology: true });
 mongoose.Promise = Promise;
 
 
+
 // POST new trip to the logged in user
 router.post("/trips", authenticateUser, async (req, res) => {
   try {
@@ -45,6 +46,9 @@ router.post("/trips", authenticateUser, async (req, res) => {
   }
 })
 
+
+
+
   // GET all trips only from logged in user
 router.get("/trips", authenticateUser, async (req, res) => {
   const loggedinUserId = req.loggedinuser._id; // Get the ID of the logged-in user
@@ -77,6 +81,8 @@ router.get("/trips", authenticateUser, async (req, res) => {
       })
     }
   })
+
+
 
 
 // GET a single trip
@@ -124,12 +130,13 @@ router.get("/trips/:tripId", authenticateUser, async (req, res) => {
 });
 
 
+
 //////////////////////////////////////////////////
 // PATCH a single trips filter and name
 // PUTTING THIS ONE ON PAUSE!!
 router.patch("/trips/:tripId", authenticateUser, async (req, res) => {
   const { tripId } = req.params; // Get the trip id from the request parameters
-  const loggedinUserId = req.loggedinuser._id; // Get the ID of the logged-in user
+  // const loggedinUserId = req.loggedinuser._id; // Get the ID of the logged-in user
 
   try {
     const { tripName, tripPrevious, tripBucketlist, tripUpcoming } = req.body; 
@@ -169,11 +176,15 @@ router.patch("/trips/:tripId", authenticateUser, async (req, res) => {
       })
     }
   })
+
+
+
+
 //////////////////////////////////////////////////
 // DELETE single trip
 router.delete("/trips/:tripId", authenticateUser, async (req, res) => {
   const { tripId } = req.params;
-  console.log("tripId:", tripId);
+  // console.log("tripId:", tripId);
   const loggedinUserId = req.loggedinuser._id; // Get the ID of the logged-in user
 
   try {
@@ -183,7 +194,7 @@ router.delete("/trips/:tripId", authenticateUser, async (req, res) => {
       // Check if the active user is the same as the logged-in user
       if (singleTrip.activeuser === loggedinUserId) {
         const deleteTrip = await Trip.findByIdAndDelete(tripId);
-        console.log("deleteTrip:", deleteTrip);
+        // console.log("deleteTrip:", deleteTrip);
 
         if (deleteTrip) {
           res.status(201).json({
@@ -217,7 +228,7 @@ router.delete("/trips/:tripId", authenticateUser, async (req, res) => {
       });
     }
   } catch (error) {
-    console.log("Error deleting trip:", error);
+    // console.log("Error deleting trip:", error);
     res.status(500).json({
       success: false,
       response: error,
@@ -228,35 +239,56 @@ router.delete("/trips/:tripId", authenticateUser, async (req, res) => {
 
 
 
+
 // PATCH to add a new card to a single trip
 router.patch("/trips/:tripId/cards", authenticateUser, async (req, res) => {
   const { tripId } = req.params;
   const loggedinUserId = req.loggedinuser._id; // Get the ID of the logged-in user
 
   try {
-    // Get the trip id from the request parameters
-    // const { cardComment, cardStars } = req.body; // Get the fields for the new Card from the request body
-    const { cardIcon, cardName, cardPhotoRef, cardPlaceId, cardRating, cardVicinity } = req.body;
+    const singleTrip = await Trip.findById(tripId);
 
-    // Find the trip by its id and update it using $push operator to add a new card to the cards array
-    const updatedTrip = await Trip.findByIdAndUpdate(
-      tripId,
-      { $push: { cards: { cardIcon, cardName, cardPhotoRef, cardPlaceId, cardRating, cardVicinity } } },
-      { new: true } // To return the updated trip document
-    );
-    if (updatedTrip) {
-      res.status(200).json({
-        success: true,
-        response: {
-          message: "Card successfully added to trip",
-          data: updatedTrip,
-        },
-      });
+    if (singleTrip) {
+      // Check if the active user is the same as the logged-in user
+      if (singleTrip.activeuser === loggedinUserId) {
+        const { cardIcon, cardName, cardPhotoRef, cardPlaceId, cardRating, cardVicinity } = req.body;
+
+        // Find the trip by its id and update it using $push operator to add a new card to the cards array
+        const updatedTrip = await Trip.findByIdAndUpdate(
+          tripId,
+          { $push: { cards: { cardIcon, cardName, cardPhotoRef, cardPlaceId, cardRating, cardVicinity } } },
+          { new: true } // To return the updated trip document
+        );
+  
+        if (updatedTrip) {
+          res.status(200).json({
+            success: true,
+            response: {
+              message: "Card successfully added to trip",
+              data: updatedTrip,
+            },
+          });
+        } else {
+          res.status(404).json({
+            success: false,
+            response: {
+              message: "Card could not be added to the trip",
+            },
+          });
+        }
+      } else {
+        res.status(403).json({
+          success: false,
+          response: {
+            message: "Access denied. User does not have permission to add a card to this trip.",
+          },
+        });
+      }
     } else {
       res.status(404).json({
         success: false,
         response: {
-          message: "Card could not be added to the trip",
+          message: "Trip not found",
         },
       });
     }
@@ -269,8 +301,9 @@ router.patch("/trips/:tripId/cards", authenticateUser, async (req, res) => {
   }
 });
 
-  
-// PATCH to add and change comments and stars of a single card in a single trip
+
+
+  // PATCH to add and change comments and stars of a single card in a single trip
 router.patch("/trips/:tripId/cards/:cardId", authenticateUser, async (req, res) => {
   const { tripId, cardId } = req.params; // Get the user id from the request parameters
 
@@ -286,6 +319,14 @@ router.patch("/trips/:tripId/cards/:cardId", authenticateUser, async (req, res) 
       });
     }
 
+    // Check if the active user is the same as the logged-in user
+    if (trip.activeuser !== req.loggedinuser._id) {
+      return res.status(403).json({
+        success: false,
+        message: "Access denied. User does not have permission to update this card.",
+      });
+    }
+
     const updateCard = trip.cards.id(cardId);
 
     if (!updateCard) {
@@ -295,26 +336,29 @@ router.patch("/trips/:tripId/cards/:cardId", authenticateUser, async (req, res) 
       });
     }
 
-      updateCard.cardComment = cardComment;
-      updateCard.cardStars = cardStars;
+    updateCard.cardComment = cardComment;
+    updateCard.cardStars = cardStars;
 
-      await trip.save()
-    
-      res.status(200).json({
-        success: true,
-        response: {
-          message: "Card successfully updated",
-          data: updateCard,
-        },
-      });
-    } catch (error) {
-      res.status(500).json({
-        success: false,
-        response: error,
-        message: "An error occurred while updating the card",
-      });
-    }
-  });
+    await trip.save();
+
+    res.status(200).json({
+      success: true,
+      response: {
+        message: "Card successfully updated",
+        data: updateCard,
+      },
+    });
+  } catch (error) {
+    res.status(500).json({
+      success: false,
+      response: error,
+      message: "An error occurred while updating the card",
+    });
+  }
+});
+
+
+
 
 
 // DELETE single card in a Trip's array of Cards
@@ -329,6 +373,14 @@ router.delete("/trips/:tripId/cards/:cardId", authenticateUser, async (req, res)
       return res.status(404).json({
         success: false,
         message: "Trip could not be found",
+      });
+    }
+
+    // Check if the active user is the same as the logged-in user
+    if (trip.activeuser !== loggedinUserId) {
+      return res.status(403).json({
+        success: false,
+        message: "Access denied. User does not have permission to delete this card.",
       });
     }
 
@@ -347,12 +399,12 @@ router.delete("/trips/:tripId/cards/:cardId", authenticateUser, async (req, res)
       { new: true }
     ); 
 
-      res.status(200).json({
-        success: true, 
-        response: {
-          message: "Successfully deleted card",
+    res.status(200).json({
+      success: true, 
+      response: {
+        message: "Successfully deleted card",
       } 
-    })
+    });
   } catch (error) {
     res.status(500).json({
       success: false, 
@@ -360,54 +412,9 @@ router.delete("/trips/:tripId/cards/:cardId", authenticateUser, async (req, res)
       message: "An error occurred while trying to delete a card"
     });
   }
-})
-
-    /*
-    if (id === loggedinUserId.toString()) {
-      // Only allow access if the requested ID matches the logged-in user's ID
-      const updatedUser = await User.findByIdAndUpdate(
-        id,
-        {
-          profileName: profileName,
-          profileText: profileText,
-          profilePicture: profilePicture,
-          profileInstagram: profileInstagram
-        },
-        { new: true }
-      );
-      if (updatedUser) {
-        res.status(200).json({
-          success: true,
-          response: {
-            message: "User successfully updated",
-            data: updatedUser,
-          },
-        });
-      } else {
-        res.status(404).json({
-          success: false,
-          response: {
-            message: "User could not be updated",
-          },
-        });
-      }
-    } else {
-      // If the requested ID does not match the logged-in user's ID
-      res.status(403).json({
-        success: false,
-        response: {
-          message: 'You are not authorized to update this user'
-        }
-      });
-    }
-  } catch (error) {
-    res.status(500).json({
-      success: false,
-      response: error,
-      message: "An error occurred while updating the user",
-    });
-  }
 });
-*/
   
+
+
+
 export default router;
