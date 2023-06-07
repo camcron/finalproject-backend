@@ -170,7 +170,6 @@ router.patch("/trips/:tripId", authenticateUser, async (req, res) => {
     }
   })
 //////////////////////////////////////////////////
-
 // DELETE single trip
 router.delete("/trips/:tripId", authenticateUser, async (req, res) => {
   const { tripId } = req.params;
@@ -178,21 +177,42 @@ router.delete("/trips/:tripId", authenticateUser, async (req, res) => {
   const loggedinUserId = req.loggedinuser._id; // Get the ID of the logged-in user
 
   try {
-    const deleteTrip = await Trip.findByIdAndDelete(tripId);
-    console.log("deleteTrip:", deleteTrip);
+    const singleTrip = await Trip.findById(tripId);
 
-    if (deleteTrip) {
-      res.status(201).json({
-        success: true,
-        response: {
-          message: "Successfully deleted trip",
-        },
-      });
+    if (singleTrip) {
+      // Check if the active user is the same as the logged-in user
+      if (singleTrip.activeuser === loggedinUserId) {
+        const deleteTrip = await Trip.findByIdAndDelete(tripId);
+        console.log("deleteTrip:", deleteTrip);
+
+        if (deleteTrip) {
+          res.status(201).json({
+            success: true,
+            response: {
+              message: "Successfully deleted trip",
+            },
+          });
+        } else {
+          res.status(404).json({
+            success: false,
+            response: {
+              message: "Trip could not be deleted",
+            },
+          });
+        }
+      } else {
+        res.status(403).json({
+          success: false,
+          response: {
+            message: "Access denied. User does not have permission to delete this trip.",
+          },
+        });
+      }
     } else {
       res.status(404).json({
         success: false,
         response: {
-          message: "Trip could not be deleted",
+          message: "Trip not found",
         },
       });
     }
