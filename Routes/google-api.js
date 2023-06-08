@@ -14,16 +14,23 @@ router.post('/api/places', async (req, res) => {
 
     if (placesResponse.ok) {
       const placesData = await placesResponse.json();
-      res.json(placesData);
+      res.status(200).json({
+        success: true,
+        response: {
+          message: "Places data fetched successfully",
+          data: placesData
+        }
+      });
     } else {
       throw new Error(`Google Places API error! Status: ${placesResponse.status}`);
     }
   } catch (error) {
-    console.error(error);
     res.status(500).json({
       success: false,
-      message: "An error occurred while fetching places data",
-      error: error.message
+      response: {
+        message: "An error occurred while fetching places data",
+        error: error
+      }
     });
   }
 });
