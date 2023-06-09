@@ -36,32 +36,31 @@ router.get("/users", async (req, res) => {
 // CREATE A NEW USER
 router.post("/users/register", async (req, res) => {
   const { username, password } = req.body
-  // const passwordRegex = /^(?=.*\d)(?=.*[a-z])(?=.*[A-Z])(?=.*[!@#\$%\^&\*]).{8,32}$/;
+  const passwordRegex = /^(?=.*\d)(?=.*[a-z])(?=.*[A-Z])(?=.*[!@#\$%\^&\*]).{8,32}$/;
     // This regular expression ensures:
     // At least one digit: (?=.*\d)
     // At least one lowercase letter: (?=.*[a-z])
     // At least one uppercase letter: (?=.*[A-Z])
-    // At least one special character: (?=.*[!@#\$%\^&\*])
-    // A total length of between 8 and 32 characters: .{8,32}
+    // A total length of between 6 and 32 characters: .{6,32}
 
-  // if (!passwordRegex.test(password)) {
-  //   return res.status(400).json({
-  //     success: false,
-  //     response: {
-  //       message: "Password needs to be between 8 and 32 characters, and include at least one number, one uppercase letter, one lowercase letter, and one special character."
-  //     }
-  //   })
-  // }
+  if (!passwordRegex.test(password)) {
+    return res.status(400).json({
+      success: false,
+      response: {
+        message: "Password needs to be between 6 and 32 characters, and include at least one number, one uppercase letter and one lowercase letter."
+      }
+    })
+  }
 
-  // const existingUserName = await User.findOne({ username: username});
-  // if (existingUserName) {
-  //   return res.status(400).json({
-  //     success: false,
-  //     response: {
-  //       message: "Username is already taken"
-  //     }
-  //   })
-  // }
+  const existingUserName = await User.findOne({ username: username});
+  if (existingUserName) {
+    return res.status(400).json({
+      success: false,
+      response: {
+        message: "Username is already taken"
+      }
+    })
+  }
   try {
     const salt = bcrypt.genSaltSync();
     const newUser = await new User({
