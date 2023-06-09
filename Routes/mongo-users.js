@@ -36,8 +36,8 @@ router.get("/users", async (req, res) => {
 // CREATE A NEW USER
 router.post("/users/register", async (req, res) => {
   const { username, password } = req.body
-  const passwordRegex = /^(?=.*\d)(?=.*[a-z])(?=.*[A-Z])(?=.*[!@#\$%\^&\*]).{8,32}$/;
-    // This regular expression ensures:
+  const passwordRegex = /^(?=.*\d)(?=.*[a-z])(?=.*[A-Z]).{6,32}$/;
+  // This regular expression ensures:
     // At least one digit: (?=.*\d)
     // At least one lowercase letter: (?=.*[a-z])
     // At least one uppercase letter: (?=.*[A-Z])
