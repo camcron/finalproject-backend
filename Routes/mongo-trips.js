@@ -82,34 +82,46 @@ router.get("/trips", authenticateUser, async (req, res) => {
 // GET a single trip
 router.get("/trips/:tripId", authenticateUser, async (req, res) => {
   const { tripId } = req.params; // Get the trip id from the request parameters
+  const loggedinUserId = req.loggedinuser._id; // Get the ID of the logged-in user
 
   try {
     const singleTrip = await Trip.findById(tripId);
 
+    // check if singleTrip is found
     if (singleTrip) {
-      res.status(200).json({
-        success: true,
-        response: {
+      // Check if the active user is the same as the logged-in user
+      if (singleTrip.activeuser === loggedinUserId) {
+        res.status(200).json({
+          success: true,
+          response: {
             message: "Successfully fetched the trip",
             data: singleTrip,
           }
-        })
+        });
       } else {
-        res.status(404).json({
-          success: false, 
+        res.status(403).json({
+          success: false,
           response: {
-            message: "Could not fetch the trip",
-          } 
-        })
+            message: "Access denied. User does not have permission to view this trip.",
+          }
+        });
       }
-    } catch (error) {
-      res.status(500).json({
+    } else {
+      res.status(404).json({
         success: false,
-        response: error,
-        message: "An error occurred while trying to fetch the trip"
-      })
+        response: {
+          message: "Could not fetch the trip",
+        } 
+      });
     }
-  })
+  } catch (error) {
+    res.status(500).json({
+      success: false,
+      response: error,
+      message: "An error occurred while trying to fetch the trip"
+    });
+  }
+});
 
 
 //////////////////////////////////////////////////
@@ -117,6 +129,7 @@ router.get("/trips/:tripId", authenticateUser, async (req, res) => {
 // PUTTING THIS ONE ON PAUSE!!
 router.patch("/trips/:tripId", authenticateUser, async (req, res) => {
   const { tripId } = req.params; // Get the trip id from the request parameters
+  const loggedinUserId = req.loggedinuser._id; // Get the ID of the logged-in user
 
   try {
     const { tripName, tripPrevious, tripBucketlist, tripUpcoming } = req.body; 
@@ -162,6 +175,7 @@ router.patch("/trips/:tripId", authenticateUser, async (req, res) => {
 router.delete("/trips/:tripId", authenticateUser, async (req, res) => {
   const { tripId } = req.params;
   console.log("tripId:", tripId);
+  const loggedinUserId = req.loggedinuser._id; // Get the ID of the logged-in user
 
   try {
     const deleteTrip = await Trip.findByIdAndDelete(tripId);
@@ -197,6 +211,7 @@ router.delete("/trips/:tripId", authenticateUser, async (req, res) => {
 // PATCH to add a new card to a single trip
 router.patch("/trips/:tripId/cards", authenticateUser, async (req, res) => {
   const { tripId } = req.params;
+  const loggedinUserId = req.loggedinuser._id; // Get the ID of the logged-in user
 
   try {
     // Get the trip id from the request parameters
@@ -284,6 +299,7 @@ router.patch("/trips/:tripId/cards/:cardId", authenticateUser, async (req, res) 
 
 // DELETE single card in a Trip's array of Cards
 router.delete("/trips/:tripId/cards/:cardId", authenticateUser, async (req, res) => {
+  const loggedinUserId = req.loggedinuser._id; // Get the ID of the logged-in user
   const { tripId, cardId } = req.params;
 
   try {
