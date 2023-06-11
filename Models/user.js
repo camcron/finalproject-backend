@@ -30,7 +30,7 @@ const UserSchema = new mongoose.Schema({
   },
   profilePicture: {
     type: String,
-    default: "https://i.postimg.cc/vmZr7ryp/istockphoto-470100848-612x612.jpg"
+    default: "https://cdn.pixabay.com/photo/2018/11/13/21/43/avatar-3814049_1280.png"
     // data: Buffer, What does this mean??
   },
   profileInstagram: {
