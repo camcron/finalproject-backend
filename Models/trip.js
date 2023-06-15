@@ -6,7 +6,7 @@ const TripSchema = new mongoose.Schema({
   tripName: {
     type: String,
     required: true,
-    maxlength: 30
+    maxlength: 25
   },
   tripPrevious: {
     type: Boolean,
