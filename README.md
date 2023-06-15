@@ -1,11 +1,23 @@
-# Express API Starter Project
+# Odyssey - Final Project at Technigo Bootcamp - Backend
 
-This project includes the packages and babel setup for an express server, and is just meant to make things a little simpler to get up and running with.
+# Technologies Used:
+- Node.js
+- Express
+- CORS
+- Mongoose
+- MongoDB
+- bcrypt
+- crypto
 
-## Getting started
+# Endpoints:
 
-Install dependencies with `npm install`, then start the server by running `npm run dev`
+xx
 
-## View it live
+# View it live
 
-Every project should be deployed somewhere. Be sure to include the link to the deployed project so that the viewer can click around and see what it's all about.
+Backend deployed on Google Cloud:
+xx
+
+
+# Frontend
+Link to frontend
