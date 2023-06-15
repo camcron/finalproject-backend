@@ -14,7 +14,7 @@ mongoose.connect(mongoUrl, { useNewUrlParser: true, useUnifiedTopology: true });
 mongoose.Promise = Promise;
 
 
-// REMOVE LATER!!!! ONLY FOR TESTING PURPOSES!!!
+// REMOVE LATER!!! ONLY FOR TESTING PURPOSES!!!
 router.get("/users", async (req, res) => {
   try {
   const allUsers = await User.find();
@@ -129,8 +129,8 @@ router.post("/users/login", async (req, res) => {
 
 // Find singleUser by ID
 router.get("/users/:userId", authenticateUser, async (req, res) => {
-  const { userId } = req.params; // Get the user id from the request parameters
-  const loggedinUserId = req.loggedinuser._id; // Get the ID of the logged-in user
+  const { userId } = req.params;
+  const loggedinUserId = req.loggedinuser._id;
 
   try {
     if (userId === loggedinUserId.toString()) {
@@ -170,11 +170,11 @@ router.get("/users/:userId", authenticateUser, async (req, res) => {
 
 
 router.patch("/users/:userId", authenticateUser, async (req, res) => {
-  const { userId } = req.params; // Get the user id from the request parameters
+  const { userId } = req.params;
 
   try {
     const { profileName, profileText, profilePicture, profileInstagram } = req.body; 
-    const loggedinUserId = req.loggedinuser._id; // Get the ID of the logged-in user
+    const loggedinUserId = req.loggedinuser._id;
 
     if (userId === loggedinUserId.toString()) {
       // Only allow access if the requested ID matches the logged-in user's ID
@@ -222,15 +222,5 @@ router.patch("/users/:userId", authenticateUser, async (req, res) => {
   }
 });
 
-// Endpoint to get logged-in user  --- REMOVE THIS!
-router.get("/users/me", authenticateUser);
-router.get("/users/me", (req, res) => {
-  const loggedinUser = req.loggedinuser;
-  res.status(200).json({
-    success: true,
-    body: loggedinUser,
-    message: "Logged-in user information",
-  });
-});
 
 export default router;

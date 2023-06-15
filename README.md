@@ -11,12 +11,12 @@
 
 # Endpoints:
 
-xx
+To be written
 
 # View it live
 
 Backend deployed on Google Cloud:
-xx
+
 
 
 # Frontend

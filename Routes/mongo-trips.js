@@ -14,7 +14,7 @@ mongoose.Promise = Promise;
 router.post("/trips", authenticateUser, async (req, res) => {
   try {
     const { tripName } = req.body;
-    const loggedinuser = req.loggedinuser; // Access the currently logged in user from req object
+    const loggedinuser = req.loggedinuser;
 
     const newTrip = await new Trip({
       tripName: tripName, 
@@ -47,11 +47,10 @@ router.post("/trips", authenticateUser, async (req, res) => {
 
   // GET all trips only from logged in user
 router.get("/trips", authenticateUser, async (req, res) => {
-  const loggedinUserId = req.loggedinuser._id; // Get the ID of the logged-in user
+  const loggedinUserId = req.loggedinuser._id;
 
   try {
     const allTrips = await Trip.find({ tripActiveuser: loggedinUserId });
-    // const allTrips = await Trip.find();
     
       if (allTrips) {
         res.status(200).json({
@@ -81,8 +80,8 @@ router.get("/trips", authenticateUser, async (req, res) => {
 
 // GET a single trip
 router.get("/trips/:tripId", authenticateUser, async (req, res) => {
-  const { tripId } = req.params; // Get the trip id from the request parameters
-  const loggedinUserId = req.loggedinuser._id; // Get the ID of the logged-in user
+  const { tripId } = req.params;
+  const loggedinUserId = req.loggedinuser._id;
 
   try {
     const singleTrip = await Trip.findById(tripId);
@@ -128,8 +127,8 @@ router.get("/trips/:tripId", authenticateUser, async (req, res) => {
 // PATCH a single trips filter and name
 // PUTTING THIS ONE ON PAUSE!!
 router.patch("/trips/:tripId", authenticateUser, async (req, res) => {
-  const { tripId } = req.params; // Get the trip id from the request parameters
-  const loggedinUserId = req.loggedinuser._id; // Get the ID of the logged-in user
+  const { tripId } = req.params; 
+  const loggedinUserId = req.loggedinuser._id;
 
   try {
     const { tripName, tripPrevious, tripBucketlist, tripUpcoming } = req.body; 
@@ -175,7 +174,7 @@ router.patch("/trips/:tripId", authenticateUser, async (req, res) => {
 router.delete("/trips/:tripId", authenticateUser, async (req, res) => {
   const { tripId } = req.params;
   console.log("tripId:", tripId);
-  const loggedinUserId = req.loggedinuser._id; // Get the ID of the logged-in user
+  const loggedinUserId = req.loggedinuser._id;
 
   try {
     const deleteTrip = await Trip.findByIdAndDelete(tripId);
@@ -214,8 +213,6 @@ router.patch("/trips/:tripId/cards", authenticateUser, async (req, res) => {
   const loggedinUserId = req.loggedinuser._id; // Get the ID of the logged-in user
 
   try {
-    // Get the trip id from the request parameters
-    // const { cardComment, cardStars } = req.body; // Get the fields for the new Card from the request body
     const { cardIcon, cardName, cardPhotoRef, cardPlaceId, cardRating, cardVicinity } = req.body;
 
     // Find the trip by its id and update it using $push operator to add a new card to the cards array
@@ -252,7 +249,7 @@ router.patch("/trips/:tripId/cards", authenticateUser, async (req, res) => {
   
 // PATCH to add and change comments and stars of a single card in a single trip
 router.patch("/trips/:tripId/cards/:cardId", authenticateUser, async (req, res) => {
-  const { tripId, cardId } = req.params; // Get the user id from the request parameters
+  const { tripId, cardId } = req.params;
 
   try {
     const { cardComment, cardStars } = req.body; 
@@ -299,7 +296,7 @@ router.patch("/trips/:tripId/cards/:cardId", authenticateUser, async (req, res) 
 
 // DELETE single card in a Trip's array of Cards
 router.delete("/trips/:tripId/cards/:cardId", authenticateUser, async (req, res) => {
-  const loggedinUserId = req.loggedinuser._id; // Get the ID of the logged-in user
+  const loggedinUserId = req.loggedinuser._id;
   const { tripId, cardId } = req.params;
 
   try {
@@ -341,53 +338,5 @@ router.delete("/trips/:tripId/cards/:cardId", authenticateUser, async (req, res)
     });
   }
 })
-
-    /*
-    if (id === loggedinUserId.toString()) {
-      // Only allow access if the requested ID matches the logged-in user's ID
-      const updatedUser = await User.findByIdAndUpdate(
-        id,
-        {
-          profileName: profileName,
-          profileText: profileText,
-          profilePicture: profilePicture,
-          profileInstagram: profileInstagram
-        },
-        { new: true }
-      );
-      if (updatedUser) {
-        res.status(200).json({
-          success: true,
-          response: {
-            message: "User successfully updated",
-            data: updatedUser,
-          },
-        });
-      } else {
-        res.status(404).json({
-          success: false,
-          response: {
-            message: "User could not be updated",
-          },
-        });
-      }
-    } else {
-      // If the requested ID does not match the logged-in user's ID
-      res.status(403).json({
-        success: false,
-        response: {
-          message: 'You are not authorized to update this user'
-        }
-      });
-    }
-  } catch (error) {
-    res.status(500).json({
-      success: false,
-      response: error,
-      message: "An error occurred while updating the user",
-    });
-  }
-});
-*/
   
 export default router;
