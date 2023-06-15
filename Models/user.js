@@ -19,14 +19,15 @@ const UserSchema = new mongoose.Schema({
   },
   profileName: {
     type: String,
-    default: ""
+    default: "",
+    trim: true,
+    maxlength: 30
   },
   profileText: {
     type: String,
-    default: ""
-    // trim: true
-    // minlength: 10,
-    // maxlength: 250
+    default: "",
+    trim: true,
+    maxlength: 100
   },
   profilePicture: {
     type: String,
