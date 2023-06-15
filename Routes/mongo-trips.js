@@ -142,7 +142,7 @@ router.patch("/trips/:tripId", authenticateUser, async (req, res) => {
         tripBucketlist: tripBucketlist,
         tripUpcoming: tripUpcoming
       },
-      { new: true }
+      { new: true, runValidators: true }
     );
 
     if (updatedSingleTrip) {

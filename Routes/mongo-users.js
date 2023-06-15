@@ -186,7 +186,7 @@ router.patch("/users/:userId", authenticateUser, async (req, res) => {
           profilePicture: profilePicture,
           profileInstagram: profileInstagram
         },
-        { new: true }
+        { new: true, runValidators: true }
       );
       if (updatedUser) {
         res.status(200).json({
