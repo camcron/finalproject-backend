@@ -14,25 +14,6 @@ mongoose.connect(mongoUrl, { useNewUrlParser: true, useUnifiedTopology: true });
 mongoose.Promise = Promise;
 
 
-// REMOVE LATER!!! ONLY FOR TESTING PURPOSES!!!
-router.get("/users", async (req, res) => {
-  try {
-  const allUsers = await User.find();
-  if (allUsers) {
-    res.status(200).json({
-      success: true,
-      body: allUsers,
-      message: "All users listed",
-    })
-  }
-  } catch (e) {
-    res.status(500).json({
-      success: false,
-      response: e
-    })
-  }
-})
-
 // CREATE A NEW USER
 router.post("/users/register", async (req, res) => {
   const { username, password } = req.body
@@ -51,7 +32,6 @@ router.post("/users/register", async (req, res) => {
       }
     })
   }
-
   const existingUserName = await User.findOne({ username: username});
   if (existingUserName) {
     return res.status(400).json({
@@ -126,6 +106,7 @@ router.post("/users/login", async (req, res) => {
     })
   }
 });
+
 
 // Find singleUser by ID
 router.get("/users/:userId", authenticateUser, async (req, res) => {
