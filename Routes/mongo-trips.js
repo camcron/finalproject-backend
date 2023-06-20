@@ -128,6 +128,7 @@ router.get("/trips/:tripId", authenticateUser, async (req, res) => {
 // PUTTING THIS ONE ON PAUSE!!
 router.patch("/trips/:tripId", authenticateUser, async (req, res) => {
   const { tripId } = req.params; 
+  // const loggedinUserId = req.loggedinuser._id;
 
   try {
     const { tripName, tripPrevious, tripBucketlist, tripUpcoming } = req.body; 
@@ -170,50 +171,33 @@ router.patch("/trips/:tripId", authenticateUser, async (req, res) => {
 //////////////////////////////////////////////////
 
 
+
 // DELETE single trip
 router.delete("/trips/:tripId", authenticateUser, async (req, res) => {
   const { tripId } = req.params;
-  const loggedinUserId = req.loggedinuser._id;
+  // const loggedinUserId = req.loggedinuser._id;
 
   try {
-    const singleTrip = await Trip.findById(tripId);
+    const deleteTrip = await Trip.findByIdAndDelete(tripId);
+    console.log("deleteTrip:", deleteTrip);
 
-    if (singleTrip) {
-      // Check if the active user is the same as the logged-in user
-      if (singleTrip.activeuser === loggedinUserId) {
-        const deleteTrip = await Trip.findByIdAndDelete(tripId);
-        if (deleteTrip) {
-          res.status(201).json({
-            success: true,
-            response: {
-              message: "Successfully deleted trip",
-            },
-          });
-        } else {
-          res.status(404).json({
-            success: false,
-            response: {
-              message: "Trip could not be deleted",
-            },
-          });
-        }
-      } else {
-        res.status(403).json({
-          success: false,
-          response: {
-            message: "Access denied. User does not have permission to delete this trip.",
-          },
-        });
-      }
+    if (deleteTrip) {
+      res.status(201).json({
+        success: true,
+        response: {
+          message: "Successfully deleted trip",
+        },
+      });
     } else {
       res.status(404).json({
         success: false,
         response: {
-          message: "Trip not found",
+          message: "Trip could not be deleted",
         },
       });
     }
   } catch (error) {
+    console.log("Error deleting trip:", error);
     res.status(500).json({
       success: false,
       response: error,
@@ -227,50 +211,30 @@ router.delete("/trips/:tripId", authenticateUser, async (req, res) => {
 // PATCH to add a new card to a single trip
 router.patch("/trips/:tripId/cards", authenticateUser, async (req, res) => {
   const { tripId } = req.params;
-  const loggedinUserId = req.loggedinuser._id;
+  const loggedinUserId = req.loggedinuser._id; // Get the ID of the logged-in user
 
   try {
-    const singleTrip = await Trip.findById(tripId);
-    if (singleTrip) {
-      // Check if the active user is the same as the logged-in user
-      if (singleTrip.activeuser === loggedinUserId) {
-        const { cardIcon, cardName, cardPhotoRef, cardPlaceId, cardRating, cardVicinity } = req.body;
+    const { cardIcon, cardName, cardPhotoRef, cardPlaceId, cardRating, cardVicinity } = req.body;
 
-        const updatedTrip = await Trip.findByIdAndUpdate(
-          tripId,
-          { $push: { cards: { cardIcon, cardName, cardPhotoRef, cardPlaceId, cardRating, cardVicinity } } },
-          { new: true } // To return the updated trip document
-        );
-  
-        if (updatedTrip) {
-          res.status(200).json({
-            success: true,
-            response: {
-              message: "Card successfully added to trip",
-              data: updatedTrip,
-            },
-          });
-        } else {
-          res.status(404).json({
-            success: false,
-            response: {
-              message: "Card could not be added to the trip",
-            },
-          });
-        }
-      } else {
-        res.status(403).json({
-          success: false,
-          response: {
-            message: "Access denied. User does not have permission to add a card to this trip.",
-          },
-        });
-      }
+    // Find the trip by its id and update it using $push operator to add a new card to the cards array
+    const updatedTrip = await Trip.findByIdAndUpdate(
+      tripId,
+      { $push: { cards: { cardIcon, cardName, cardPhotoRef, cardPlaceId, cardRating, cardVicinity } } },
+      { new: true } // To return the updated trip document
+    );
+    if (updatedTrip) {
+      res.status(200).json({
+        success: true,
+        response: {
+          message: "Card successfully added to trip",
+          data: updatedTrip,
+        },
+      });
     } else {
       res.status(404).json({
         success: false,
         response: {
-          message: "Trip not found",
+          message: "Card could not be added to the trip",
         },
       });
     }
@@ -287,7 +251,6 @@ router.patch("/trips/:tripId/cards", authenticateUser, async (req, res) => {
 // PATCH to add and change comments and stars of a single card in a single trip
 router.patch("/trips/:tripId/cards/:cardId", authenticateUser, async (req, res) => {
   const { tripId, cardId } = req.params;
-  const loggedinUserId = req.loggedinuser._id;
 
   try {
     const { cardComment, cardStars } = req.body; 
@@ -300,15 +263,6 @@ router.patch("/trips/:tripId/cards/:cardId", authenticateUser, async (req, res) 
         message: "Trip could not be found",
       });
     }
-    
-    // Check if the active user is the same as the logged-in user
-    if (trip.activeuser !== loggedinUserId) {
-      return res.status(403).json({
-        success: false,
-        message: "Access denied. User does not have permission to update this card.",
-      });
-    }
-
 
     const updateCard = trip.cards.id(cardId);
 
@@ -355,15 +309,6 @@ router.delete("/trips/:tripId/cards/:cardId", authenticateUser, async (req, res)
         message: "Trip could not be found",
       });
     }
-
-    // Check if the active user is the same as the logged-in user
-    if (trip.activeuser !== loggedinUserId) {
-      return res.status(403).json({
-        success: false,
-        message: "Access denied. User does not have permission to delete this card.",
-      });
-    }
-    
 
     const card = trip.cards.id(cardId);
 
