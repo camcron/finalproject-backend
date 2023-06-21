@@ -1,7 +1,6 @@
 import User from '../Models/user';
 
 // MIDDLEWARE TO AUTHENTICATE THE USER
-
 const authenticateUser = async (req, res, next) => {
   const accessToken = req.header('Authorization');
   try {
